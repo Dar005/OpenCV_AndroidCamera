@@ -3,6 +3,8 @@ package com.example.darran.opencv_test;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -31,17 +33,29 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import org.opencv.android.Utils;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.example.darran.opencv_test.Constants.SCAN_IMAGE_LOCATION;
+import static org.opencv.android.Utils.matToBitmap;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -212,13 +226,41 @@ public class CameraActivity extends AppCompatActivity {
                     Image image = null;
                     try{
                         image = reader.acquireLatestImage();
+
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
-                        save(bytes);
-                    }catch(FileNotFoundException e){
-                        e.printStackTrace();
-                    }catch(IOException e){
+                        // Save original image
+                       // save(bytes);
+
+
+                        // Create bitmap from byte array then crate a mat from thebitmap
+                        Bitmap bmp =  BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        Mat orig = new Mat();
+                        bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
+                        Utils.bitmapToMat(bmp, orig);
+
+                        // Image converted to Mat "orig", Do OpenCv tasks here.....
+                        Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
+
+
+                        Mat edge = new Mat();
+                        Mat dst = new Mat();
+
+                        // apply canny edge detector
+                        Imgproc.Canny(orig, edge, 80, 90);
+                        Imgproc.cvtColor(edge, dst, Imgproc.COLOR_GRAY2RGBA, 4);
+
+
+
+                        // Convert Mat back to Bitmap then byte array for saving changed image.
+                        Utils.matToBitmap(dst, bmp);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bmp.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+                        byte[] byteOut = stream.toByteArray();
+                        save(byteOut);
+
+                    } catch(IOException e){
                         e.printStackTrace();
                     }finally {
                         if (image != null){

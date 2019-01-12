@@ -6,10 +6,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import org.opencv.core.Core;
+
 public class MainActivity extends AppCompatActivity {
 
 
     Button btnCustomCamera;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
 
+    static {
+        System.loadLibrary("opencv_java3");
+       // System.loadLibrary("jniLibs");
     }
 }
