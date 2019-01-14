@@ -241,8 +241,7 @@ public class CameraActivity extends AppCompatActivity {
                         Utils.bitmapToMat(bmp, orig);
 
                         // Image converted to Mat "orig", Do OpenCv tasks here.....
-                        Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
-
+                        //Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
 
                         Mat edge = new Mat();
                         Mat dst = new Mat();
@@ -250,8 +249,6 @@ public class CameraActivity extends AppCompatActivity {
                         // apply canny edge detector
                         Imgproc.Canny(orig, edge, 80, 90);
                         Imgproc.cvtColor(edge, dst, Imgproc.COLOR_GRAY2RGBA, 4);
-
-
 
                         // Convert Mat back to Bitmap then byte array for saving changed image.
                         Utils.matToBitmap(dst, bmp);

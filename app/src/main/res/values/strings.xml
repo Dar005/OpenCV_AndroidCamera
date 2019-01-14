@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Custom Camera</string>
+    <string name="app_name">Camera App with OpenCv Analysis</string>
     <string name="take_picture">Take Picture</string>
     <string name="grid_overlay">Grid Overlay</string>
 </resources>

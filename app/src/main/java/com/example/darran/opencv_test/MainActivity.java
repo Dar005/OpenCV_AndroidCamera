@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
         btnCustomCamera = findViewById(R.id.btnCustomCamera);
 
-
         btnCustomCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -33,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Static block to start OpenCv libs...
     static {
         System.loadLibrary("opencv_java3");
        // System.loadLibrary("jniLibs");
