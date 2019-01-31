@@ -35,9 +35,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -225,33 +228,67 @@ public class CameraActivity extends AppCompatActivity {
                 public void onImageAvailable(ImageReader reader) {
                     Image image = null;
                     try{
-                        image = reader.acquireLatestImage();
 
+                        image = reader.acquireLatestImage();
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
-                        // Save original image
-                       // save(bytes);
 
-
-                        // Create bitmap from byte array then crate a mat from thebitmap
+                        // Create bitmap from byte array then crate a mat from the bitmap
                         Bitmap bmp =  BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         Mat orig = new Mat();
                         bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
                         Utils.bitmapToMat(bmp, orig);
 
-                        // Image converted to Mat "orig", Do OpenCv tasks here.....
-                        //Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
-
-                        Mat edge = new Mat();
-                        Mat dst = new Mat();
+                        /*
+                         Image has been converted to Mat "orig"
+                         */
 
                         // apply canny edge detector
-                        Imgproc.Canny(orig, edge, 80, 90);
-                        Imgproc.cvtColor(edge, dst, Imgproc.COLOR_GRAY2RGBA, 4);
+                        Mat edge = new Mat();
+                        Mat rgba = new Mat();
+                        Mat threeChannel = new Mat();
+
+                        Imgproc.cvtColor(orig, rgba, Imgproc.COLOR_RGBA2RGB);
+
+                        Imgproc.cvtColor(rgba, threeChannel, Imgproc.COLOR_RGBA2GRAY);
+                        Imgproc.threshold(threeChannel, threeChannel, 100, 255,
+                                Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
+
+                        Mat fg = new Mat(rgba.size(), CvType.CV_8U);
+                        Imgproc.erode(threeChannel, fg, new Mat(),
+                                new Point(-1,-1), 2);
+
+                        Mat bg = new Mat(rgba.size(), CvType.CV_8U);
+                        Imgproc.dilate(threeChannel, bg, new Mat(),
+                                new Point(-1, -1), 3);
+                        Imgproc.threshold(bg, bg,1, 128, Imgproc.THRESH_BINARY_INV);
+
+                        Mat markers  = new Mat(rgba.size(), CvType.CV_8U, new Scalar(0));
+                        Core.add(fg, bg, markers);
+
+                        Mat marker_tempo = new Mat();
+                        markers.convertTo(marker_tempo, CvType.CV_32S);
+
+                        Imgproc.watershed(rgba, marker_tempo);
+                        marker_tempo.convertTo(markers, CvType.CV_8U);
+
+
+
+                        Imgproc.applyColorMap(markers, markers, Imgproc.COLORMAP_BONE);
+
+
+
+                        /**
+                         * CREATE A Threshold image (White with Black outline)
+                         *Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
+                         * Imgproc.adaptiveThreshold(orig, thres, 255,
+                         * Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
+                         * 11, 3);
+                        */
 
                         // Convert Mat back to Bitmap then byte array for saving changed image.
-                        Utils.matToBitmap(dst, bmp);
+                        Utils.matToBitmap(markers, bmp);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bmp.compress(Bitmap.CompressFormat.JPEG, 70, stream);
                         byte[] byteOut = stream.toByteArray();

@@ -6,14 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import org.opencv.core.Core;
-
 public class MainActivity extends AppCompatActivity {
 
-
     Button btnCustomCamera;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
