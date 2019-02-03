@@ -18,7 +18,6 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -38,30 +37,21 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.TermCriteria;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.darran.opencv_test.Constants.SCAN_IMAGE_LOCATION;
-import static org.opencv.android.Utils.matToBitmap;
-
-public class CameraActivity extends AppCompatActivity {
+public class StartExperimentActivity extends AppCompatActivity {
 
     private static final String TAG = "CustomCameraAPI";
     private Button takePictureButton;
@@ -153,7 +143,7 @@ public class CameraActivity extends AppCompatActivity {
         @Override
         public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result){
             super.onCaptureCompleted(session, request, result);
-            Toast.makeText(CameraActivity.this, "Saved:" + file, Toast.LENGTH_LONG).show();
+            Toast.makeText(StartExperimentActivity.this, "Saved:" + file, Toast.LENGTH_LONG).show();
             createCameraPreview();
         }
     };
@@ -235,97 +225,45 @@ public class CameraActivity extends AppCompatActivity {
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
 
+                        /** Need to use google vision api to detect text
+                         * from captured image and then use that text to
+                         * name the experiment...
+                         */
+
+
+
+
                         // Create bitmap from byte array then crate a mat from the bitmap
                         Bitmap bmp =  BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         Mat orig = new Mat();
                         bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
                         Utils.bitmapToMat(bmp, orig);
 
-                        /**
-                         * Need to add gps for capture location
-                         * weather for location and date and time
-                         * of capture and store to the database.
-                         */
-
-
                         /*
                          Image has been converted to Mat "orig"
                          */
 
-                        /*
-
-                        Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGRA2BGR);
-
-                        Mat image_reshape = orig.reshape(1, orig.cols()*orig.rows());
-                        Mat image32f_reshape = new Mat();
-                        image_reshape.convertTo(image32f_reshape, CvType.CV_32F, 1.0 / 255.0);
-
-                        Mat labels = new Mat();
-                        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT,
-                                100, 1);
-                        Mat centers = new Mat();
-                        int clusterCount = 5, attempts = 1;
-                        Core.kmeans(image32f_reshape, clusterCount, labels, criteria, attempts,
-                                Core.KMEANS_PP_CENTERS, centers);
-
-                        centers.reshape(3);
-
-
-                        */
 
 
 
                         // Code does applyColorMap() function
                         Mat edge = new Mat();
-                        Mat rgba = new Mat();
-                        Mat threeChannel = new Mat();
+                        Mat thres = new Mat();
+                        Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
 
-                        Imgproc.cvtColor(orig, rgba, Imgproc.COLOR_BGR2Lab);
-
-                        Imgproc.cvtColor(rgba, threeChannel, Imgproc.COLOR_RGBA2GRAY);
-                        Imgproc.threshold(threeChannel, threeChannel, 100, 255,
-                                Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
-
-                        // Foreground
-                        Mat fg = new Mat(rgba.size(), CvType.CV_8U);
-                        Imgproc.erode(threeChannel, fg, new Mat(),
-                                new Point(-1,-1), 2);
-
-                        // Background
-                        Mat bg = new Mat(rgba.size(), CvType.CV_8U);
-                        Imgproc.dilate(threeChannel, bg, new Mat(),
-                                new Point(-1, -1), 3);
-                        Imgproc.threshold(bg, bg,1, 128, Imgproc.THRESH_BINARY_INV);
-
-                        Mat markers  = new Mat(rgba.size(), CvType.CV_8U, new Scalar(0));
-                        Core.add(fg, bg, markers);
-
-                        Mat marker_tempo = new Mat();
-                        markers.convertTo(marker_tempo, CvType.CV_32S);
-
-                        Imgproc.watershed(rgba, marker_tempo);
-                        marker_tempo.convertTo(markers, CvType.CV_8U);
+                        Imgproc.Canny(orig, edge, 70, 100);
 
 
 
-                       // Imgproc.applyColorMap(markers, markers, Imgproc.COLORMAP_BONE);
+                        //CREATE A Threshold image (White with Black outline)
+                        //Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
+                        //Imgproc.adaptiveThreshold(orig, thres, 255,
+                          //      Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
+                            //    11, 3);
 
-                      //  Imgproc.adaptiveThreshold(markers, out, 255,
-                         //       Imgproc.ADAPTIVE_THRESH_MEAN_C,
-                           //     Imgproc.THRESH_BINARY, 11, 3);
-
-
-
-                        /**
-                         * CREATE A Threshold image (White with Black outline)
-                         *Imgproc.cvtColor(orig, orig, Imgproc.COLOR_BGR2GRAY);
-                         * Imgproc.adaptiveThreshold(orig, thres, 255,
-                         * Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
-                         * 11, 3);
-                        */
 
                         // Convert Mat back to Bitmap then byte array for saving changed image.
-                        Utils.matToBitmap(markers, bmp);
+                        Utils.matToBitmap(edge, bmp);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bmp.compress(Bitmap.CompressFormat.JPEG, 70, stream);
                         byte[] byteOut = stream.toByteArray();
@@ -360,7 +298,7 @@ public class CameraActivity extends AppCompatActivity {
                 @Override
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result){
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(CameraActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StartExperimentActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
                     createCameraPreview();
                 }
             };
@@ -409,7 +347,7 @@ public class CameraActivity extends AppCompatActivity {
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(CameraActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StartExperimentActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
                 }
             }, null);
 
@@ -431,7 +369,7 @@ public class CameraActivity extends AppCompatActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
+                ActivityCompat.requestPermissions(StartExperimentActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
             manager.openCamera(cameraId, stateCallback, null);
@@ -468,7 +406,7 @@ public class CameraActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CAMERA_PERMISSION){
             if (grantResults[0] == PackageManager.PERMISSION_DENIED){
                 // Close app
-                Toast.makeText(CameraActivity.this, "Sorry, you cannot use this app without granting premissions", Toast.LENGTH_LONG).show();
+                Toast.makeText(StartExperimentActivity.this, "Sorry, you cannot use this app without granting premissions", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
