@@ -228,7 +228,21 @@ public class StartExperimentActivity extends AppCompatActivity {
                         /** Need to use google vision api to detect text
                          * from captured image and then use that text to
                          * name the experiment...
+                         * need to create and experiment class and call
+                         * it when an experiment is started i.e. capture
+                         * image of information sheet extract information from
+                         * it with ocr an use information to create experiment
+                         *
                          */
+
+                        // Create new Experiment
+                        // Working now need to ensure the
+                       // Experiment exp = new Experiment(image,"test");
+
+
+                   //     if (exp.getExperimentName() != null){
+                   //         Toast.makeText(StartExperimentActivity.this, "Experiment Started", Toast.LENGTH_SHORT).show();
+                   //     }
 
 
 
@@ -298,7 +312,7 @@ public class StartExperimentActivity extends AppCompatActivity {
                 @Override
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result){
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(StartExperimentActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(StartExperimentActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
                     createCameraPreview();
                 }
             };
