@@ -18,6 +18,10 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -75,29 +79,89 @@ public class ViewImage extends AppCompatActivity {
                 int g = Color.green(pixel);
                 int b = Color.blue(pixel);
 
-                HashMap<String, Integer> colorList = new HashMap<String, Integer>();
+                int touchX = (int) motionEvent.getX();
+                int touchY = (int) motionEvent.getY();
 
+                int imageX = touchX - viewCoords[0];
+                int imageY = touchY - viewCoords[1];
+
+                Toast.makeText(ViewImage.this, "R(" + r + ")\n" + "G(" + g + ")\n" + "B("+ b + ")", Toast.LENGTH_SHORT).show();
+
+                //Toast.makeText(ViewImage.this, "X-Coord = " +imageX + ", Y-Coord = "+imageY, Toast.LENGTH_LONG).show();
+
+//                int colorAtLocation = bitmap.getPixel((int)motionEvent.getX(), (int)motionEvent.getY());
+//                //int colorAtLocation = bitmap.getPixel(imageX, imageY);
+//
+//                int r = Color.red(colorAtLocation);
+//                int g = Color.green(colorAtLocation);
+//                int b = Color.blue(colorAtLocation);
+
+
+                Log.v("Color at Touch location", r + g + b +"");
+
+                //int real_x = (imageX *)
+
+                Log.v("X-COORD", imageX+"");
+                Log.v("Y-COORD", imageY+"");
+
+                //Toast.makeText(ViewImage.this, "X-Coord = " +imageX + ", Y-Coord = "+imageY, Toast.LENGTH_LONG).show();
 
                // Toast.makeText(ViewImage.this, "R(" + r + ")\n" + "G(" + g + ")\n" + "B("+ b + ")", Toast.LENGTH_SHORT).show();
+
+                int upperR = r + 25;
+                int lowerR = r - 25;
+                int upperG = g + 25;
+                int lowerG = g - 25;
+                int upperB = b + 25;
+                int lowerB = b - 25;
+
+                int upperWhite = 255;
+                int lowerWhite = 190;
+
+                Toast.makeText(ViewImage.this, "R(" + upperR +", "+ lowerR + ")\n" + "G(" + upperG + ", " + lowerG + ")\n" + "B("+ upperB + ", "+ lowerB + ")", Toast.LENGTH_SHORT).show();
+
+
                 int [] pixelColor = new int[2];
-                int count = 0;
                 int colorCount = 0;
+               // int pixelColor;
                 String color = "";
+                int count = 0;
+                int total = bitmap.getHeight() * bitmap.getWidth();
+
+                HashMap<String, Integer> colorList = new HashMap<String, Integer>();
+
                 for (int y = 0; y < bitmap.getHeight(); y++){
 
                     for (int x = 0; x < bitmap.getWidth(); x++){
 
+                        //pixel = bitmap.getPixel(x, y);
+
+                        int R = Color.red(pixelColor[count]);
+                        int G = Color.green(pixelColor[count]);
+                        int B = Color.blue(pixelColor[count]);
+
                         pixelColor[count] = bitmap.getPixel(x, y);
                         // White
-                        if (Color.red(pixelColor[count]) > 229 && Color.green(pixelColor[count]) > 229 && Color.blue(pixelColor[count]) > 229){
+                        if (lowerWhite < Color.red(pixelColor[count]) && upperWhite >= Color.red(pixelColor[count])
+                                && lowerWhite < Color.green(pixelColor[count]) && upperWhite >= Color.green(pixelColor[count])
+                                && lowerWhite < Color.blue(pixelColor[count]) && upperWhite >= Color.blue(pixelColor[count])) {
                             // add white ++ count
                             color = "white";
+
+                        }
+                        else if(lowerR < Color.red(pixelColor[count]) && upperR > Color.red(pixelColor[count])
+                                && lowerG < Color.green(pixelColor[count]) && upperG > Color.green(pixelColor[count])
+                                && lowerB < Color.blue(pixelColor[count]) && upperB > Color.blue(pixelColor[count])){
+                            // within selected colour range..
+                            color = "good";
+
                         }
                         // other colours
                         else {
                             color = "unknown";
+                            //total++;
                         }
-                        count++;
+                        //count++;
 
                         if (colorList.containsKey(color)){
                             colorCount = colorList.get(color);
@@ -111,10 +175,161 @@ public class ViewImage extends AppCompatActivity {
                     }
                 }
 
+                Integer whiteCount = colorList.get("white");
+                Integer goodCount = colorList.get("good");
+                Integer unknownCount = colorList.get("unknown");
 
-                int white = colorList.get("white");
-                int other = colorList.get("unknown");
-                Toast.makeText(ViewImage.this, "White : " + white + "\n Other : " + other , Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewImage.this, "White = " + whiteCount + "\nGood = "
+                        + goodCount + "\nUnknown = " + unknownCount , Toast.LENGTH_LONG).show();
+
+                Integer leaf = total - whiteCount;
+                Integer diseasePer = (goodCount * 100) / leaf;
+
+
+//                int bad = unknownCount/leaf;
+//                int per = bad * 100;
+               // int ans = 100 - diseasePer;
+
+                Toast.makeText(ViewImage.this, "Disease percentage = " + diseasePer + "%", Toast.LENGTH_LONG).show();
+
+                    // Toast.makeText(ViewImage.this, "R(" + r + ")\n" + "G(" + g + ")\n" + "B("+ b + ")", Toast.LENGTH_SHORT).show();
+               // int [] pixelColor = new int[2];
+                //int pixelColor;
+                //int count = 0;
+               // int colorCount = 0;
+               // String color = "";
+               // int total = 0;
+
+//                Mat pic = new Mat();
+//                Mat hsvPic = new Mat();
+//
+//                Bitmap bmp = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+//                Utils.bitmapToMat(bmp, pic);
+//
+//               // pic = Imgcodecs.imread(name);
+//
+//                Imgproc.cvtColor(pic, hsvPic, Imgproc.COLOR_RGB2HSV);
+//
+//                int height = hsvPic.rows();
+//                int width = hsvPic.cols();
+//                int total = height * width;
+//
+//                HashMap<String, Integer> colorList = new HashMap<String, Integer>();
+//
+//                String color = "";
+//                int colorCount = 0;
+//                double blue = 0.0;
+//                String test = "";
+//
+//                for (int i = 0; i < height; i++) {
+//                    for (int k = 0; k < width; k++) {
+//
+//                        /**
+//                         * HSV works usually works on degrees, percent, percent a H = 0 - 360,
+//                         * S = 0 - 100%, V = 0 - 100%
+//                         * In OpenCV however HSV uses degrees, value, value. Value is between 0 and 255
+//                         * like RGB values
+//                         * Furthermore OpenCv does not store Hue(H) in range of 0 - 360, instead it uses
+//                         * 0 - 180 (something to do with storing it in 8 bits.....)
+//                         *
+//                         */
+//
+//                        double[] hsv = hsvPic.get(i, k);
+//
+//                        double h = hsv[0];
+//                        double s = hsv[1];
+//                        double v = hsv[2];
+//
+//
+//                       // test = h + "," + s + "," + v;
+//
+//                        // check for white and ignore if found
+//                        if (h == 0.0 && s == 0.0 && v == 255.0) {
+//                            color = "white";
+//                        }
+//
+//                        // red
+//                        else if(h >= 0.0 && h <= 20.0){
+//                            color = "red";
+//                        }
+//
+//                        // yellow
+//                        else if(h > 20.0 && h <= 40.0){
+//                            color = "yellow";
+//                        }
+//
+//
+//                        // green
+//                        else if(h > 40.0 && h <= 80.0){
+//                            color = "green";
+//                        }
+//
+//                        // blue
+//                        else if(h > 80.0 && h <= 180.0){
+//
+//                            color = "blue";
+//                            //System.out.println("color" + h + ", " + s + ", " + v);
+//                            blue = h;
+//                        }
+//                        else {
+//                            color = "Unknown color";
+//                            //System.out.println("color" + h + ", " + s + ", " + v);
+//                        }
+//
+//
+//
+//                        /**
+//                         *  Check if color is already in hash map and increase count if it
+//                         *  is or add new key value with count equal to 1
+//                         */
+//                        if (colorList.containsKey(color)) {
+//                            colorCount = colorList.get(color);
+//                            colorCount++;
+//                            colorList.put(color, colorCount);
+//                        }else {
+//
+//                            colorCount = 1;
+//                            colorList.put(color, colorCount);
+//                        }
+//
+//                    }
+//                }
+
+//                Toast.makeText(ViewImage.this, "Analysing.....", Toast.LENGTH_SHORT).show();
+//                for (int y = 0; y < bitmap.getHeight(); y++){
+//
+//                    for (int x = 0; x < bitmap.getWidth(); x++){
+//
+//                        pixelColor = bitmap.getPixel(x, y);
+//                        // White
+//                        if (Color.red(pixelColor) > 217 && Color.green(pixelColor) > 217 && Color.blue(pixelColor) > 217){
+//                            // add white ++ count
+//                            color = "white";
+//                            total++;
+//                        }
+//                        // other colours
+//                        else {
+//                            color = "unknown";
+//                            total++;
+//                        }
+//                        //count++;
+//
+//                        if (colorList.containsKey(color)){
+//                            colorCount = colorList.get(color);
+//                            colorCount++;
+//                            colorList.put(color, colorCount);
+//
+//                        }else{
+//                            colorCount = 1;
+//                            colorList.put(color, colorCount);
+//                        }
+//                    }
+//                }
+
+
+                //int white = colorList.get("white");
+                //int other = colorList.get("unknown");
+               // Toast.makeText(ViewImage.this, "Total : " + total , Toast.LENGTH_SHORT).show();
 //
 //                int touchX = (int) motionEvent.getX();
 //                int touchY = (int) motionEvent.getY();
