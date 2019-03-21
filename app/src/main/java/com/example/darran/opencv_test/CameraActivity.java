@@ -144,7 +144,7 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
 
         imgPreview = findViewById(R.id.imgPreview);
-        previewImage = findViewById(R.id.btn_previewImage);
+     //   previewImage = findViewById(R.id.btn_previewImage);
         gridImage = findViewById(R.id.imageView);
 
         textureView = (TextureView) findViewById(R.id.texture);
@@ -165,12 +165,12 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
         // preview captured image NIT WORKING
-        previewImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //previewCapturedImage();
-            }
-        });
+//        previewImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //previewCapturedImage();
+//            }
+//        });
 
         // Start Location servive and get lat and lon
         startService(new Intent(CameraActivity.this,
