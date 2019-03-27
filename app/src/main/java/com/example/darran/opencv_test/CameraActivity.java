@@ -436,7 +436,7 @@ public class CameraActivity extends AppCompatActivity {
                      *
                      */
 
-                    Intent test = new Intent(CameraActivity.this, com.example.darran.opencv_test.ViewImage.class);
+                    Intent test = new Intent(CameraActivity.this, com.example.darran.opencv_test.HSVanalysis.class);
                     test.putExtra("file", fileName);
 
                     startActivityForResult(test, 2);

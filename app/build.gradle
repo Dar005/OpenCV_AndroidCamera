@@ -29,6 +29,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+    implementation 'com.google.firebase:firebase-core:16.0.8'
+
+    implementation 'com.google.firebase:firebase-ml-vision:19.0.3' // need for text detection
+    implementation 'com.google.firebase:firebase-ml-vision-image-label-model:17.0.2' // not used
+    implementation 'com.google.firebase:firebase-ml-vision-face-model:17.0.2' // not used
+    implementation 'com.google.firebase:firebase-ml-model-interpreter:18.0.0' // not used
+
     implementation 'com.karumi:dexter:5.0.0'
     compile project(path: ':openCVLibrary343')
 }
+
+apply plugin: 'com.google.gms.google-services'

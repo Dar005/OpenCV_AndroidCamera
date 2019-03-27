@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ViewImage">
+
 
 
     <ImageView
         android:id="@+id/imgView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:scaleType="centerCrop" />
 
 </android.support.constraint.ConstraintLayout>

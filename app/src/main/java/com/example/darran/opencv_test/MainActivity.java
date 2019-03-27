@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static final String APP_ID = "b11dc521fd3aecc6374e2e331dc090e3";
-    Button btnCustomCamera, btnStartExp, btnGPS, btnWeather;
+    Button btnCustomCamera, btnStartExp, btnGPS, btnWeather, btnGetText;
     TextView tvGPS, tvTemp, tvDesc;
 
     String lon = "";
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         btnStartExp = findViewById(R.id.btnStartExp);
         btnGPS = findViewById(R.id.btnGPS);
         btnWeather = findViewById(R.id.btnWeather);
+        btnGetText = findViewById(R.id.btnGetText);
 
         tvGPS = findViewById(R.id.tvGPS);
         tvTemp = findViewById(R.id.tvTemp);
@@ -93,6 +94,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        // Start Experiment
+        btnGetText.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, com.example.darran.opencv_test.TextReg.class);
+                startActivity(intent);
+            }
+        }));
 
         btnWeather.setOnClickListener(new View.OnClickListener() {
             @Override
